@@ -27,22 +27,31 @@ class Quoter:
         return cls.instance
 
     def take_photo(self, text):
-        """Take random photo_path from _images. Write text on the image.
-        Save it and return that
+        """Take random photo_path from _images and write the text.
+
+        Calculate the average coordinates of the picture. Use the quote_text_update method.
+        Insert \n in the returned text_list in the join method to get string.
+        Write that text on the image. Save it in user_images / and return the uploaded photo
+
         """
         photo_path = random.choice(self._images)
         image = Image.open(photo_path)
         quote_image = ImageDraw.Draw(image)
 
-        font_size = 75
+        font_size = 65
         font = ImageFont.truetype(random.choice(self._fonts), font_size)
-        text_width, text_height = font.getsize(text)
+
+        upd_text = self.quote_text_update(text)
+        longest_line = max(upd_text)
+
+        text_width, text_height = font.getsize(longest_line)
+        text_height *= len(upd_text)
+        real_text = "\n".join(upd_text)
 
         x = 1 * image.size[0] / 2 - 1 * text_width / 2
         y = 1 * image.size[1] / 2 - 1 * text_height / 2
 
-        upd_text = self.quote_text_update(text)
-        quote_image.text(xy=(x, y), text=upd_text, font=font, fill=(255, 255, 255))
+        quote_image.text(xy=(x, y), text=real_text, font=font, fill=(255, 255, 255))
 
         new_user_image_path = f'user_images/draw{random.randint(1, 9999999)}.png'
         image.save(new_user_image_path)
@@ -51,19 +60,25 @@ class Quoter:
 
     @staticmethod
     def quote_text_update(text):
-        """Insert \n after every 3 words and return the update string"""
-        count = 0
+        """If length of text > 3 -> split it for 3 words and return as list"""
         word_lst = []
+        option = ''
+        count = 0
+        txt_lst = text.split(' ')
 
-        for word in text.split(' '):
-            if count == 3:
-                word += "\n"
-                count = 0
-            else:
+        if len(txt_lst) > 3:
+            for word in txt_lst:
+                option += word + ' '
                 count += 1
-            word_lst.append(word)
-
-        return ' '.join(word_lst)
+                if count == 3:
+                    word_lst.append(option)
+                    option = ''
+                    count = 0
+            else:
+                word_lst.append(option)
+            return word_lst
+        else:
+            return [text]
 
     @staticmethod
     def remove_photo():
