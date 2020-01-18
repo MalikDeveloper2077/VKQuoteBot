@@ -98,20 +98,36 @@ class Quoter:
 
 
 def main():
-    """Event loop and send message"""
+    """Event loop and send message.
+
+    If the user sends a message to the bot, check.
+    If the text length is < 130, take a random photo using quote.take photo(text) and send a message.
+    Else send a message using text and img, where it says "too big text"
+
+    """
     quoter = Quoter()
 
     for event in long_poll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me and event.text:
-            photo = quoter.take_photo(event.text)
-            quoter.remove_photo()
+            if len(event.text) < 130:
+                photo = quoter.take_photo(event.text)
+                quoter.remove_photo()
 
-            vk.messages.send(
-                user_id=event.user_id,
-                message='Держи, брат.',
-                attachment=f'photo{photo["owner_id"]}_{photo["id"]}',
-                random_id=random.randint(1, 21212212121)
-            )
+                vk.messages.send(
+                    user_id=event.user_id,
+                    message='Держи, брат.',
+                    attachment=f'photo{photo["owner_id"]}_{photo["id"]}',
+                    random_id=random.randint(1, 21212212121)
+                )
+            else:
+                img_for_big_text = upload.photo_messages(photos='images/for_big_text.jpg')[0]
+
+                vk.messages.send(
+                    user_id=event.user_id,
+                    message='Брат, слишком много текста. Брат, по-братски, давай поменьше.',
+                    attachment=f'photo{img_for_big_text["owner_id"]}_{img_for_big_text["id"]}',
+                    random_id=random.randint(1, 21212212121)
+                )
         elif event.type == VkEventType.MESSAGE_NEW and event.to_me and not event.text:
             vk.messages.send(
                 user_id=event.user_id,

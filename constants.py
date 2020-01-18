@@ -1,4 +1,4 @@
-API_KEY = ')'
+API_KEY = ':)'
 
 IMAGES_FOR_QUOTES = [
     'images/1.jpg',
@@ -10,9 +10,9 @@ IMAGES_FOR_QUOTES = [
     'images/7.jpg',
     'images/8.jpg',
     'images/9.jpg',
+    'images/10.jpg',
     'images/11.jpg',
     'images/12.jpg',
-    'images/13.jpg',
     'images/14.jpg',
     'images/15.jpg',
     'images/16.jpg',
@@ -29,7 +29,21 @@ IMAGES_FOR_QUOTES = [
     'images/27.jpg',
     'images/28.jpg',
     'images/29.jpg',
-    'images/30.jpg',
+    'images/31.jpg',
+    'images/32.jpg',
+    'images/33.jpg',
+    'images/34.jpg',
+    'images/35.jpg',
+    'images/36.jpg',
+    'images/37.jpg',
+    'images/38.jpg',
+    'images/39.jpg',
+    'images/40.jpg',
+    'images/41.jpg',
+    'images/42.jpg',
+    'images/43.jpg',
+    'images/44.png',
+    'images/45.jpg'
 ]
 
 FONTS_FOR_QUOTES = [
@@ -42,5 +56,5 @@ FONTS_FOR_QUOTES = [
     'fonts/7.ttf',
     'fonts/8.ttf',
     'fonts/9.otf',
-    'fonts/11.ttf',
+    'fonts/11.ttf'
 ]
