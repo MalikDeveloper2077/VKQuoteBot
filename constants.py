@@ -1,4 +1,4 @@
-API_KEY = ':)'
+API_KEY = '7f43fe928d2eb114bbbaf557d45d2745a0cd57c56d540c4d7aa51973c98a730f630a63f296a350be45f8e'
 
 IMAGES_FOR_QUOTES = [
     'images/1.jpg',
@@ -51,7 +51,6 @@ FONTS_FOR_QUOTES = [
     'fonts/2.ttf',
     'fonts/3.ttf',
     'fonts/4.ttf',
-    'fonts/5.ttf',
     'fonts/6.otf',
     'fonts/7.ttf',
     'fonts/8.ttf',
