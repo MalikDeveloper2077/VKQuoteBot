@@ -60,17 +60,17 @@ class Quoter:
 
     @staticmethod
     def quote_text_update(text):
-        """If length of text > 3 -> split it for 3 words and return as list"""
+        """If length of text > 2 -> split it for 3 words and return as list"""
         word_lst = []
         option = ''
         count = 0
         txt_lst = text.split(' ')
 
-        if len(txt_lst) > 3:
+        if len(txt_lst) > 2:
             for word in txt_lst:
                 option += word + ' '
                 count += 1
-                if count == 3:
+                if count == 2:
                     word_lst.append(option)
                     option = ''
                     count = 0
@@ -110,6 +110,12 @@ def main():
                 user_id=event.user_id,
                 message='Держи, брат.',
                 attachment=f'photo{photo["owner_id"]}_{photo["id"]}',
+                random_id=random.randint(1, 21212212121)
+            )
+        elif event.type == VkEventType.MESSAGE_NEW and event.to_me and not event.text:
+            vk.messages.send(
+                user_id=event.user_id,
+                message='Брат, напиши мне текст.',
                 random_id=random.randint(1, 21212212121)
             )
 
