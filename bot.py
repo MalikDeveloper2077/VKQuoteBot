@@ -31,54 +31,40 @@ class Quoter:
 
         Calculate the average coordinates of the picture. Use the quote_text_update method.
         Insert \n in the returned text_list in the join method to get string.
-        Write that text on the image. Save it in user_images / and return the uploaded photo
+        Write that text on the image. Save it in user_images/ and return the uploaded photo
 
         """
         photo_path = random.choice(self._images)
         image = Image.open(photo_path)
+        image = image.convert('RGB')
         quote_image = ImageDraw.Draw(image)
 
-        font_size = 65
+        # Font
+        font_size = 55
         font = ImageFont.truetype(random.choice(self._fonts), font_size)
 
+        # Update text
         upd_text = self.quote_text_update(text)
-        longest_line = max(upd_text)
+        longest_line = self.get_longest_line(upd_text)
 
+        # Coordinates
         text_width, text_height = font.getsize(longest_line)
         text_height *= len(upd_text)
         real_text = "\n".join(upd_text)
 
         x = 1 * image.size[0] / 2 - 1 * text_width / 2
         y = 1 * image.size[1] / 2 - 1 * text_height / 2
+        if x < 0:
+            x = 10
+        if y < 0:
+            y = 10
 
+        # Write text and save
         quote_image.text(xy=(x, y), text=real_text, font=font, fill=(255, 255, 255))
-
         new_user_image_path = f'user_images/draw{random.randint(1, 9999999)}.png'
         image.save(new_user_image_path)
 
         return upload.photo_messages(photos=new_user_image_path)[0]
-
-    @staticmethod
-    def quote_text_update(text):
-        """If length of text > 2 -> split it for 3 words and return as list"""
-        word_lst = []
-        option = ''
-        count = 0
-        txt_lst = text.split(' ')
-
-        if len(txt_lst) > 2:
-            for word in txt_lst:
-                option += word + ' '
-                count += 1
-                if count == 2:
-                    word_lst.append(option)
-                    option = ''
-                    count = 0
-            else:
-                word_lst.append(option)
-            return word_lst
-        else:
-            return [text]
 
     @staticmethod
     def remove_photo():
@@ -96,12 +82,55 @@ class Quoter:
         for path in paths:
             os.remove(f'user_images/{path}')
 
+    @staticmethod
+    def quote_text_update(text):
+        """If text length > 3 cut it by 3 words and return as list.
+        Else return given text as list
+        """
+        word_lst = []
+        option = ''
+        count = 0
+        txt_lst = text.split(' ')
+
+        if len(txt_lst) > 3:
+            for word in txt_lst:
+                option += word + ' '
+                count += 1
+                if count == 3:
+                    word_lst.append(option)
+                    option = ''
+                    count = 0
+            else:
+                word_lst.append(option)
+            return word_lst
+        else:
+            return [text]
+
+    @staticmethod
+    def get_longest_line(line_lst):
+        """Return the longest line of line list"""
+        longest_line = ''
+        if len(line_lst) > 1:
+            max_count = 0
+
+            for line in line_lst:
+                count = 0
+                for char in line:
+                    count += 1
+                if count > max_count:
+                    max_count = count
+                    longest_line = line
+        else:
+            longest_line = line_lst[0]
+
+        return longest_line
+
 
 def main():
     """Event loop and send message.
 
     If the user sends a message to the bot, check.
-    If the text length is < 130, take a random photo using quote.take photo(text) and send a message.
+    If the text length is < 160, take a random photo using quote.take_photo(text) and send a message.
     Else send a message using text and img, where it says "too big text"
 
     """
@@ -109,7 +138,7 @@ def main():
 
     for event in long_poll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me and event.text:
-            if len(event.text) < 130:
+            if len(event.text) < 160:
                 photo = quoter.take_photo(event.text)
                 quoter.remove_photo()
 
