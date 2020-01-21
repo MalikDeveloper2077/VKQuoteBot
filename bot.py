@@ -106,39 +106,30 @@ class Quoter:
         else:
             return [text]
 
-    @staticmethod
-    def get_longest_line(line_lst):
+    def get_longest_line(self, line_lst):
         """Return the longest line of line list"""
         longest_line = ''
         if len(line_lst) > 1:
             max_count = 0
 
             for line in line_lst:
+                replaced_line = self.quotes_replace_in_str(line)
                 count = 0
-                for char in line:
+                for char in replaced_line:
                     count += 1
                 if count > max_count:
                     max_count = count
-                    longest_line = line
+                    longest_line = replaced_line
         else:
-            longest_line = line_lst[0]
+            longest_line = self.quotes_replace_in_str(line_lst[0])
 
-        if '\"\"' in longest_line:
-            longest_line.replace('\"\"', 'e')
         return longest_line
 
     @staticmethod
     def quotes_replace_in_str(string):
         """Replace quotation marks symbols in a str with << and >>"""
-        count = 0
-        while '"' in string:
-            if count % 2 != 0:
-                string = string.replace('"', '>>', 1)
-            elif count % 2 == 0:
-                string = string.replace('"', '<<', 1)
-            count += 1
-
-        return string
+        replaced_str = string.replace('&quot;', '"')
+        return replaced_str
 
 
 def main():
