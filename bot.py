@@ -7,7 +7,6 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 
 import constants
 
-
 # Settings
 vk_session = vk_api.VkApi(token=constants.API_KEY)
 long_poll = VkLongPoll(vk_session)
@@ -46,11 +45,12 @@ class Quoter:
         # Update text
         upd_text = self.quote_text_update(text)
         longest_line = self.get_longest_line(upd_text)
+        end_upd_text = "\n".join(upd_text)
+        real_text = self.quotes_replace_in_str(end_upd_text)
 
         # Coordinates
         text_width, text_height = font.getsize(longest_line)
         text_height *= len(upd_text)
-        real_text = "\n".join(upd_text)
 
         x = 1 * image.size[0] / 2 - 1 * text_width / 2
         y = 1 * image.size[1] / 2 - 1 * text_height / 2
@@ -123,7 +123,22 @@ class Quoter:
         else:
             longest_line = line_lst[0]
 
+        if '\"\"' in longest_line:
+            longest_line.replace('\"\"', 'e')
         return longest_line
+
+    @staticmethod
+    def quotes_replace_in_str(string):
+        """Replace quotation marks symbols in a str with << and >>"""
+        count = 0
+        while '"' in string:
+            if count % 2 != 0:
+                string = string.replace('"', '>>', 1)
+            elif count % 2 == 0:
+                string = string.replace('"', '<<', 1)
+            count += 1
+
+        return string
 
 
 def main():
@@ -142,29 +157,38 @@ def main():
                 photo = quoter.take_photo(event.text)
                 quoter.remove_photo()
 
-                vk.messages.send(
-                    user_id=event.user_id,
-                    message='Держи, брат.',
-                    attachment=f'photo{photo["owner_id"]}_{photo["id"]}',
-                    random_id=random.randint(1, 21212212121)
-                )
+                try:
+                    vk.messages.send(
+                        user_id=event.user_id,
+                        message='Держи, брат.',
+                        attachment=f'photo{photo["owner_id"]}_{photo["id"]}',
+                        random_id=random.randint(1, 21212212121)
+                    )
+                except vk_api.exceptions.ApiError:
+                    pass
             else:
                 img_for_big_text = upload.photo_messages(photos='images/for_big_text.jpg')[0]
 
+                try:
+                    vk.messages.send(
+                        user_id=event.user_id,
+                        message='Брат, слишком много текста. Брат, по-братски, давай поменьше.',
+                        attachment=f'photo{img_for_big_text["owner_id"]}_{img_for_big_text["id"]}',
+                        random_id=random.randint(1, 21212212121)
+                    )
+                except vk_api.exceptions.ApiError:
+                    pass
+
+        elif event.type == VkEventType.MESSAGE_NEW and event.to_me and not event.text:
+            try:
                 vk.messages.send(
                     user_id=event.user_id,
-                    message='Брат, слишком много текста. Брат, по-братски, давай поменьше.',
-                    attachment=f'photo{img_for_big_text["owner_id"]}_{img_for_big_text["id"]}',
+                    message='Брат, напиши мне текст.',
                     random_id=random.randint(1, 21212212121)
                 )
-        elif event.type == VkEventType.MESSAGE_NEW and event.to_me and not event.text:
-            vk.messages.send(
-                user_id=event.user_id,
-                message='Брат, напиши мне текст.',
-                random_id=random.randint(1, 21212212121)
-            )
+            except vk_api.exceptions.ApiError:
+                pass
 
 
 if __name__ == '__main__':
     main()
-

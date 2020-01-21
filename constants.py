@@ -95,7 +95,12 @@ IMAGES_FOR_QUOTES = [
     'images/92.jpg',
     'images/93.jpg',
     'images/94.jpg',
-    'images/95.jpg'
+    'images/95.jpg',
+    'images/96.jpg',
+    'images/97.jpg',
+    'images/98.jpg',
+    'images/99.jpg',
+    'images/100.jpg',
 ]
 
 FONTS_FOR_QUOTES = [
@@ -106,5 +111,5 @@ FONTS_FOR_QUOTES = [
     'fonts/5.ttf',
     'fonts/6.ttf',
     'fonts/7.otf',
-    'fonts/8.ttf'
+    'fonts/8.ttf',
 ]
