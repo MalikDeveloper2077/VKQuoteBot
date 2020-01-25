@@ -69,18 +69,9 @@ class Quoter:
     @staticmethod
     def remove_photo():
         """Get all user_images paths and delete them"""
-        folder = []
-        paths = []
-
-        for i in os.walk('test'):
-            folder.append(i)
-
         for address, dirs, files in os.walk('user_images'):
             for file in files:
-                paths.append(file)
-
-        for path in paths:
-            os.remove(f'user_images/{path}')
+                os.remove(f'user_images/{file}')
 
     @staticmethod
     def quote_text_update(text):
@@ -132,53 +123,73 @@ class Quoter:
         return replaced_str
 
 
-def main():
-    """Event loop and send message.
+def flood_control(function):
+    def inner(*args, **kwargs):
+        try:
+            function(*args, **kwargs)
+        except vk_api.exceptions.ApiError:
+            pass
+    return inner
 
-    If the user sends a message to the bot, check.
-    If the text length is < 160, take a random photo using quote.take_photo(text) and send a message.
-    Else send a message using text and img, where it says "too big text"
+
+@flood_control
+def main():
+    """Event loop and send a messages.
+
+    If the user sends a message to the bot, check:
+    If the user is a group member, check:
+    text length is < 160 -> take a random photo using quote.take_photo(text) and send a message.
+
+    If the message is not a text -> send a message using text and img, where it says "too big text"
+    If the user is not a group member -> send a message "join to our group"
 
     """
     quoter = Quoter()
 
     for event in long_poll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me and event.text:
-            if len(event.text) < 160:
-                photo = quoter.take_photo(event.text)
-                quoter.remove_photo()
+            # If the message is text
 
-                try:
+            if vk.groups.isMember(access_token=constants.API_KEY, group_id='190122647', user_id=event.user_id):
+                # If the user is a group member
+
+                if len(event.text) < 160:
+                    photo = quoter.take_photo(event.text)
+                    quoter.remove_photo()
+
                     vk.messages.send(
                         user_id=event.user_id,
                         message='Держи, брат.',
                         attachment=f'photo{photo["owner_id"]}_{photo["id"]}',
                         random_id=random.randint(1, 21212212121)
                     )
-                except vk_api.exceptions.ApiError:
-                    pass
-            else:
-                img_for_big_text = upload.photo_messages(photos='images/for_big_text.jpg')[0]
+                else:
+                    img_for_big_text = upload.photo_messages(photos='images/for_big_text.jpg')[0]
 
-                try:
                     vk.messages.send(
                         user_id=event.user_id,
-                        message='Брат, слишком много текста. Брат, по-братски, давай поменьше.',
+                        message='Брат, слишком много текста\nБрат, по-братски, давай поменьше..',
                         attachment=f'photo{img_for_big_text["owner_id"]}_{img_for_big_text["id"]}',
                         random_id=random.randint(1, 21212212121)
                     )
-                except vk_api.exceptions.ApiError:
-                    pass
-
-        elif event.type == VkEventType.MESSAGE_NEW and event.to_me and not event.text:
-            try:
+            else:
+                # If the user is not a group member
+                message = 'Брат, я смотрю ты не подписан на группу...\nПодпишись и можешь мною пользоваться 😎'
+                img_for_join = upload.photo_messages(photos='images/for_join.jpg')[0]
                 vk.messages.send(
                     user_id=event.user_id,
-                    message='Брат, напиши мне текст.',
+                    message=message,
+                    attachment=f'photo{img_for_join["owner_id"]}_{img_for_join["id"]}',
                     random_id=random.randint(1, 21212212121)
                 )
-            except vk_api.exceptions.ApiError:
-                pass
+
+        elif event.type == VkEventType.MESSAGE_NEW and event.to_me and not event.text:
+            # If the message is not text
+            vk.messages.send(
+                user_id=event.user_id,
+                message='Брат, напиши мне текст.',
+                random_id=random.randint(1, 21212212121)
+            )
 
 
 if __name__ == '__main__':

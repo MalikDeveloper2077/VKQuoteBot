@@ -101,6 +101,11 @@ IMAGES_FOR_QUOTES = [
     'images/98.jpg',
     'images/99.jpg',
     'images/100.jpg',
+    'images/101.jpg',
+    'images/102.jpg',
+    'images/103.jpg',
+    'images/104.jpg',
+    'images/105.jpg',
 ]
 
 FONTS_FOR_QUOTES = [
