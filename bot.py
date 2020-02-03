@@ -8,6 +8,7 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 import constants
 
 # Settings
+GROUP_ID = '190122647'
 vk_session = vk_api.VkApi(token=constants.API_KEY)
 long_poll = VkLongPoll(vk_session)
 vk = vk_session.get_api()
@@ -30,7 +31,7 @@ class Quoter:
 
         Calculate the average coordinates of the picture. Use the quote_text_update method.
         Insert \n in the returned text_list in the join method to get string.
-        Write that text on the image. Save it in user_images/ and return the uploaded photo
+        Write this text on the image. Save it in user_images/ and return the uploaded photo
 
         """
         photo_path = random.choice(self._images)
@@ -150,7 +151,7 @@ def main():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me and event.text:
             # If the message is text
 
-            if vk.groups.isMember(access_token=constants.API_KEY, group_id='190122647', user_id=event.user_id):
+            if vk.groups.isMember(access_token=constants.API_KEY, group_id=GROUP_ID, user_id=event.user_id):
                 # If the user is a group member
 
                 if len(event.text) < 160:
