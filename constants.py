@@ -126,6 +126,8 @@ IMAGES_FOR_QUOTES = [
     'images/123.jpg',
     'images/124.jpg',
     'images/125.jpg',
+    'images/126.jpeg',
+    'images/127.jpg',
 ]
 
 FONTS_FOR_QUOTES = [
